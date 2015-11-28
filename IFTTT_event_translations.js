@@ -1,7 +1,13 @@
+//IFTTT is a service that uses my cell phone's connection to wifi as a trigger and adds those rows to a Google Sheet. 
+//This code translates those events into a second sheet that determines the activity and counts the number of minutes spent doing that activity.
+
+
 var ss = SpreadsheetApp.openById('###My Google Sheet key###');
 var ifttSheet = ss.getSheetByName('Sheet1');
 var logSheet = ss.getSheetByName('Event Log');
 
+//You could set this up with a trigger. I set it up to just one run once
+//once I decide what I'm going to do with this data I'll probably change this.
 function myFunction() {
   logSheet.clearContents();
   var data = ifttSheet.getDataRange().getValues();
@@ -26,6 +32,11 @@ function myFunction() {
     
     
   }
+
+//I had a heck of a time with the default time format from IFTTT. 
+//A combination of formatting issues from IFTTT, Google App Script and Google Sheets 
+//ALL have different transations for time and they all conflicted with each other. 
+//This function was my way of translating into a Date object.
 
 function parseIfttDate(myStr){
   var mL = {'January':1, 'February':2, 'March':3, 'April':4, 'May':5, 'June':6, 'July':7, 'August':8,
@@ -52,6 +63,7 @@ function parseIfttDate(myStr){
   return d
   }
 
+//This function determines the activity based on that event and the next event
 function determineActivity(A,B){
  var discovery = "unable to determine activity";
  
