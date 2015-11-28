@@ -18,3 +18,4 @@ Year |	Month |	Day |	Hour |	Duration |	Activity
 2015 |	11 |	17 |	16 |	120 |	Hanging out at home
 2015 |	11 |	17 |	18 |	2 |	Went out, not to work
 
+Duration is in minutes.
