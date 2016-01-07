@@ -1,13 +1,9 @@
-//IFTTT is a service that uses my cell phone's connection to wifi as a trigger and adds those rows to a Google Sheet. 
-//This code translates those events into a second sheet that determines the activity and counts the number of minutes spent doing that activity.
 
 
-var ss = SpreadsheetApp.openById('###My Google Sheet key###');
+var ss = SpreadsheetApp.openById('## my spreadsheet key ##');
 var ifttSheet = ss.getSheetByName('Sheet1');
 var logSheet = ss.getSheetByName('Event Log');
 
-//You could set this up with a trigger. I set it up to just one run once
-//once I decide what I'm going to do with this data I'll probably change this.
 function myFunction() {
   logSheet.clearContents();
   var data = ifttSheet.getDataRange().getValues();
@@ -27,23 +23,17 @@ function myFunction() {
       
     var lapsedTime0 = Math.floor(((eventDateB - eventDateA) % msDay) / msMinute);
     var activity = determineActivity(eventA,eventB);
-    logSheet.appendRow([eventDateA.getYear(),eventDateA.getMonth(),eventDateA.getDate(),eventDateA.getHours(),lapsedTime0,activity])
+    var myMonth = eventDateA.getMonth()
+    if (eventDateA.getMonth() == 0){myMonth=12}  //I couldn't get it to stop saying that december is a 0, so I just fixed it with this bandaid.
+    logSheet.appendRow([eventDateA.getYear(),myMonth,eventDateA.getDate(),eventDateA.getHours(),lapsedTime0,activity])
     }
-    
-    
   }
 
-//I had a heck of a time with the default time format from IFTTT. 
-//A combination of formatting issues from IFTTT, Google App Script and Google Sheets 
-//ALL have different transations for time and they all conflicted with each other. 
-//This function was my way of translating into a Date object.
-
 function parseIfttDate(myStr){
+
   var mL = {'January':1, 'February':2, 'March':3, 'April':4, 'May':5, 'June':6, 'July':7, 'August':8,
-            'September':9, 'October':10, 'November':11, 'December':12};
-            
+            'September':9, 'October':10, 'November':11, 'December':12};            
   var myArray = myStr.replace(' at', "").split(" ");
- 
   var myMonth = mL[myArray[0]];
   var myDate = myArray[1].replace(',','');
   var myYear = myArray[2];
@@ -58,21 +48,27 @@ function parseIfttDate(myStr){
 
   var d = new Date(myYear, myMonth, myDate,myHours,myMinutes,0,0)
   var returnValues = [myMonth,myDate,myYear,"\'"+myMinutes,"\'"+myTime,myHours,"\'"+String(d)]
-  //logSheet.appendRow(returnValues)
-  
   return d
   }
 
-//This function determines the activity based on that event and the next event
 function determineActivity(A,B){
  var discovery = "unable to determine activity";
- 
+    //home and work functions:
     if((A  == "Leaving Work")&&(B == "Arriving at Home")){discovery = "Going from work to home"}
     if((A  == "Arriving at Home")&&(B == "Leaving Home")){discovery = "Hanging out at home"}
     if((A  == "Leaving Home")&&(B == "Arriving at Home")){discovery = "Went out, not to work"}
     if((A  == "Leaving Home")&&(B == "Arriving at Work")){discovery = "Going from home to work"}
     if((A  == "Arriving at Work")&&(B == "Leaving Work")){discovery = "Working"}
     if((A  == "Leaving Work")&&(B == "Arriving at Work")){discovery = "Left work for a bit, and came back"}
-
+    //functions for my girlfried's place:
+    if((A  == "Leaving Home")&&(B == "entered stacias house")){discovery = "Going from home to Stacia's"}
+    if((A  == "left Stacias place")&&(B == "entered stacias house")){discovery = "Left Stacia's place for a bit, and came back"}
+    if((A  == "entered stacias house")&&(B == "left Stacias place")){discovery = "Hanging out at Stacia's"}
+    if((A  == "Leaving Work")&&(B == "entered stacias house")){discovery = "Going from work to Stacia's"}
+    if((A  == "left Stacias place")&&(B == "Arriving at Work")){discovery = "Going from Stacia's to work"}
+    if((A  == "left Stacias place")&&(B == "Arriving at Home")){discovery = "Going from Stacia's place to home"}
+    //Handling odd duplicates and missing logs
+    if((A  == "Leaving Work")&&(B == "Leaving Work")){discovery = "Working"}
+    if((A  == "Leaving Home")&&(B == "Leaving Home")){discovery = "Hanging out at home"}
   return discovery;
  }
