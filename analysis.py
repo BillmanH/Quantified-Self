@@ -1,6 +1,7 @@
 # processing the data in the output.xls file
 import numpy as np
 import pandas as pd
+import math
 
 path = "C:\Users\Bill\Desktop\Fun Stuff\{}"
 
@@ -87,23 +88,124 @@ small_df = df[df['dataObje']>datetime.strptime("11/15/2015", '%m/%d/%Y')]
 small_df[myCols].corr()
 small_df[myCols].corr().to_csv(path.format("cor_sheet.csv"),encoding="utf-8")
 
-
-expenses
-
 expenses['Date'] = expenses.index
 expenses['dataObje'] = expenses['Date'].apply(lambda X: fixYear(X))
 expenses = expenses.sort('dataObje')	
 
+#date time 
 
+#counting the number of drinks per day
+mergedDF['hadDrinks'] = mergedDF['Out for drinks']>0
+drinksdf = mergedDF['numDrinks'] = mergedDF['Out for drinks'].apply(lambda x: math.ceil(x/10)).dropna()
+days_drinks = mergedDF['numDrinks'] = mergedDF['Out for drinks'].apply(lambda x: math.ceil(x/10)).fillna(0)
+days_drinks.resample('W',how='sum')
+
+singleVarHistogram(np.array(days_drinks.tolist()),bins=30,title="Distribution of drinks",xaxis="#")
+days_drinks.describe()
+drinksByWeek = pd.DataFrame(days_drinks.resample('W',how='sum'))
+drinksByWeek['limit'] = 15
+drinksByWeek['control'] = drinksByWeek['Out for drinks'] - drinksByWeek['limit']
+drinksByWeek['over'] = drinksByWeek['control'] > 0
+
+bunchOfVarLine([np.array(drinksByWeek['Out for drinks']),
+				np.array(drinksByWeek['limit'])],
+				['drinks','limit'],
+				label="chart")
+
+
+plt.plot(x_pos,np.array(drinksByWeek['control']),
+		label='level of control',
+		color=tahzoo_colors[1])
+		
+plt.bar(x_pos,np.array(drinksByWeek['control']),
+		label='level of control',
+		color=tahzoo_colors[1])
+
+len(drinksByWeek[drinksByWeek['over']])/float(len(len(drinksByWeek)))
+				
 #getting a bag of words model. 
+import gensim as g
+import nltk
+
 df1['dataObje'] = df1['Date'].apply(lambda X: fixYear(X))
-	
+
 doc_dic = {}
 for i in np.unique(df1['dataObje']):
 	subset = df1[df1['dataObje']==i]
 	doc_dic[i] = subset['Reciept text'].tolist()
 	
+documents = doc_dic.values()
+docKeys = doc_dic.keys()
+
+stop_list = ["SOYLENT",
+			"BROWNPAPERTICKETS...",
+			"ADDRESS CHANGE",
+			"AMTRAK CASCADES Q12",
+			"VIRGINIA MASON FR...",
+			"UDACITY&nbsp; INC",
+			"VENDINI TICKETS",
+			"Metrix Communicat...",
+			"TICKETWEB",
+			"BOLTBUS - INTERNE...",
+			"Amazon web services",
+			"Amazon Web Services",
+			"AMTRAK",
+			"UDEMY.COM",
+			"NETFLIX.COM",
+			"DSC",
+			"ALASKA AIRLINE AS...",
+			"Kappes Miller Man...",
+			"SOUND TRANSIT - S..."]
+			
+texts = [[item for item in document if item not in stop_list]
+	for document in documents]
+	
+from collections import defaultdict
+frequency = defaultdict(int)
+for text in texts:
+	for token in text:
+		frequency[token] += 1
+		
+texts = [[token for token in text if frequency[token] > 1]
+	for text in texts]
+
+dictionary = g.corpora.Dictionary(texts)
+corpus = [dictionary.doc2bow(text) for text in texts]
 
 
+n_topics = 20
+model = g.models.ldamodel.LdaModel(corpus,
+										id2word=dictionary,
+										num_topics=n_topics,
+										passes=4) #increasing the passes increases time.
 
+										
+										
+#------------------ ********* -----------------------------
+#------------------ REPORTING -----------------------------
+#------------------ ********* -----------------------------
+results = model.print_topics(num_topics=n_topics, num_words=50)
+
+results_matrix = [[[b for b in a.split("*")] for a in result.split(" + ")] for result in results]
+
+#getting the top words lists (limit is .0000)
+top_words = pd.DataFrame()
+for index,item in enumerate(results_matrix):
+	for word in item:
+		top_words.loc[word[1],str(index)] = float(word[0])			
+
+scored_docs = pd.DataFrame()
+#adding the scores to the corpus
+for item in doc_dic.items():
+	doc_bow = dictionary.doc2bow(item[1])
+	for x in model[doc_bow]:
+		scored_docs.loc[item[0],"topic_{}".format(str(x[0]))] = x[1]	
+	
+#out to excel:
+writer = pd.ExcelWriter(path.format('reciept_model.xlsx'))
+top_words.to_excel(writer,'word list',encoding='utf-8')
+scored_docs.to_excel(writer,'data frame',encoding='utf-8')
+writer.save()
+
+%save C:\\Users\\Bill\\Desktop\\Fun Stuff\\my_QA_session 1-103
 

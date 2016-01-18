@@ -7,31 +7,13 @@ import gensim as g
 import nltk
 
 
-work_directory = "C:\Users\Bill\Desktop\Brandwatch\DataFiles\{}"
+
 #------------------ CLEANING -----------------------------
-apostrophe = [u"\u2019",u"\u2014"]
-blank_chars = [u"\u2018",u"\u2026"]
-chars = "abcdefghijklmnopqrstuvwxyz "  #must contain a space (" ") or else the .split() functions won't work right.
-words_we_like = ['NN' ,'NNS', 'NNP', 'NNPS','VB','VBD','VBG','VBN','VBP','VBZ','IN','JJ','JJR','JJS']
+df = df1.copy() #backup just in case I mess it up :)
 
-df = df2.copy() #backup just in case I mess it up :)
-
-for char in apostrophe:
-	df.fullText = df.fullText.str.replace(char,u"'")
-for char in blank_chars:
-	df.fullText = df.fullText.str.replace(char,u" ")
-
-df.fullText = df.fullText.str.replace(u"\\'",u"")
-
-def cut_chars(x):
-	x = x.lower()
-	x = [char for char in x if char in chars]
-	return ''.join(x)
-
-df.fullText = df.fullText.apply(lambda x: cut_chars(x))
-	
+doc_dic
 #the documents don't actually get into the data file
-documents = df.fullText.values.tolist()
+documents = df['Reciept text'].values.tolist()
 
 #------------------ LEXILIZING -----------------------------
 #this extra step removes all words that aren't nouns verbs or adjectives
@@ -43,7 +25,7 @@ def nouns_verbs_and_adjectives_only(document):
 documents = [nouns_verbs_and_adjectives_only(document) for document in documents]
 	
 stoplist = nltk.corpus.stopwords.words()
-texts = [[word for word in document.split() if word not in stoplist]
+texts = [[item for item in document]
 	for document in documents]
 	
 from collections import defaultdict
@@ -64,7 +46,7 @@ corpus = [dictionary.doc2bow(text) for text in texts]
 
 #------------------ MODELING -----------------------------
 
-n_topics = 100
+n_topics = 10
 model = g.models.ldamodel.LdaModel(corpus,
 										id2word=dictionary,
 										num_topics=n_topics,
@@ -75,7 +57,7 @@ model = g.models.ldamodel.LdaModel(corpus,
 #------------------ ********* -----------------------------
 #------------------ REPORTING -----------------------------
 #------------------ ********* -----------------------------
-results_O = model.print_topics(num_topics=n_topics, num_words=50)
+results = model.print_topics(num_topics=n_topics, num_words=50)
 
 results_matrix = [[[b for b in a.split("*")] for a in result.split(" + ")] for result in results]
 
