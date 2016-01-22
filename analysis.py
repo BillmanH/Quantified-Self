@@ -209,3 +209,6 @@ writer.save()
 
 %save C:\\Users\\Bill\\Desktop\\Fun Stuff\\my_QA_session 1-103
 
+
+That's it. I'll write up annother example of how to get findings in 
+annother Notebook. Data cleaning is a big part of the work and I wanted to get that portion separatley. 
