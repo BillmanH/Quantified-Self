@@ -19,3 +19,12 @@ Year |	Month |	Day |	Hour |	Duration |	Activity
 2015 |	11 |	17 |	18 |	2 |	Went out, not to work
 
 Duration is in minutes.
+
+
+##Transformation and Vizualisation
+I've placed all of the data transformation and basic analysis into a couple of ipython notebooks in order 
+to make it easier to study the process and outcome.
+### Gathering and Cleaning the data:
+<a href="https://github.com/BillmanH/Quantified-Self/blob/master/Joining%20and%20cleaning%20data.ipynb">Joining and cleaning data.ipynb</a>
+### Running statistics and making charts:
+<a href="https://github.com/BillmanH/Quantified-Self/blob/master/QS_analysis.ipynb">QS_analysis.ipynb</a>
