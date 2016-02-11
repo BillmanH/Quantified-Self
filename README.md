@@ -28,3 +28,5 @@ to make it easier to study the process and outcome.
 <a href="https://github.com/BillmanH/Quantified-Self/blob/master/Joining%20and%20cleaning%20data.ipynb">Joining and cleaning data.ipynb</a>
 ### Running statistics and making charts:
 <a href="https://github.com/BillmanH/Quantified-Self/blob/master/QS_analysis.ipynb">QS_analysis.ipynb</a>
+### Model to try and guess what I am doing at any moment:
+<a href="https://github.com/BillmanH/Quantified-Self/blob/master/what%20am%20I%20doing%20right%20now.ipynb">QS_analysis.ipynb</a>
