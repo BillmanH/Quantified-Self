@@ -1,5 +1,5 @@
 import matplotlib 
-matplotlib.use('nbagg')
+matplotlib.use('ggplot')
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -7,6 +7,7 @@ import numpy as np
 
 from __future__ import print_function
 from time import time
+from collections import Counter
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
@@ -63,7 +64,6 @@ def weekend_or_work_week(x):
 		answer = "WorkNight"
 	return answer
 
-	
 def score_document(doc_dic,df,lda, tf_feature_names, n_top_words, n_topics,
 					returnDF=True,confidence=.01):
 	'''
@@ -72,6 +72,8 @@ def score_document(doc_dic,df,lda, tf_feature_names, n_top_words, n_topics,
 	returnDF : By default returns a DataFrame, set to false to return a dict.
 	confidence : this is the threashold that the model must meet to match the document to a topic.
 	set to .01 to include practically everything, set to .99 to include almost nothing.
+	
+	
 	document_scores = score_document(doc_dic,df,lda, tf_feature_names, n_top_words, n_topics)
 	'''
 	results_dict = {}
@@ -99,6 +101,8 @@ def score_document(doc_dic,df,lda, tf_feature_names, n_top_words, n_topics,
 		return pd.DataFrame(results_dict).T
 	else:
 		return results_dict
+		
+		
 #------------------------------------------------------------------------------------------	
 ###Begin - Here:  MODEL TRAINING
 #------------------------------------------------------------------------------------------
@@ -169,31 +173,20 @@ df = get_all_topics(lda, tf_feature_names, n_top_words,n_topics)
 #------------------------------------------------------------------------------------------
 
 
-key = '9/12/2015'
-words = [tf_feature_names[i] for i in tf.getrow(doc_dic.keys().index(key)).indices]
-
-
 #DF that scores an individual document against each topic 
-scores = df[[word in words for word in df.index]]
-TM_Score = pd.DataFrame()
-TM_Score['docScore'] = scores.sum() 
-TM_Score['globalScore'] = df.sum()
-TM_Score['relevance'] = TM_Score['docScore']/TM_Score['globalScore']
-TM_Score['theme'] = get_topic_names(lda, tf_feature_names, n_top_words, n_topics)
-
-
-
+document_scores = score_document(doc_dic,df,lda, tf_feature_names, n_top_words, n_topics)
 	
 #to see the distribution of scores:
 #this is usefull for understanding how good the model is at placing individual documents. 
 document_scores['top_score'].hist(bins=60)
 
-from collections import Counter
-histTopics = Counter(document_scores['top_topic'].tolist())
+labels,values = zip(*Counter(document_scores['top_topic'].tolist()).items())
 
-x = [
-y_pos = np.arange(len(histTopics.keys()))
-plt.barh(y_pos, histTopics.values(), xerr=error, align='center', alpha=0.4)
+indexes = np.arange(len(labels))
+width = 1
+plt.bar(indexes, values, width)
+plt.xticks(indexes + width * 0.5)
+plt.show()
 
 document_scores['top_score'].describe()
 	

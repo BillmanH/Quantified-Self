@@ -38,10 +38,8 @@ mergedDF['Date'] = mergedDF.index
 #checking the 2016 year issue:
 Data_2016 = mergedDF[mergedDF['dataObje']>datetime.strptime("1/1/2016", '%m/%d/%Y')]
 
-#now I'm going to export to excel because I can eplore better there. 
-mergedDF.to_csv(path.format("mergedDF.csv"),encoding="utf-8")
-mysubset = ['Going from work to home','Out for drinks']
 
+mysubset = ['Going from work to home','Out for drinks']
 
 def getX_Y(df,mysubset):
 	'''x,y = getX_Y(mergedDF,mysubset)'''
@@ -65,10 +63,10 @@ x,y = getX_Y(mergedDF,mysubset)
 compareTwoArrays(x,y,kind='reg')
 
 #dividing by quarter:
-dfQ1 = mergedDF[(mergedDF['dataObje']>datetime.strptime("1/1/2015", '%m/%d/%Y'))&(mergedDF['dataObje']<datetime.strptime("3/31/2015", '%m/%d/%Y'))]
-dfQ2 = mergedDF[(mergedDF['dataObje']>datetime.strptime("4/1/2015", '%m/%d/%Y'))&(mergedDF['dataObje']<datetime.strptime("6/30/2015", '%m/%d/%Y'))]
-dfQ3 = mergedDF[(mergedDF['dataObje']>datetime.strptime("7/1/2015", '%m/%d/%Y'))&(mergedDF['dataObje']<datetime.strptime("9/30/2015", '%m/%d/%Y'))]
-dfQ4 = mergedDF[(mergedDF['dataObje']>datetime.strptime("10/1/2015", '%m/%d/%Y'))&(mergedDF['dataObje']<datetime.strptime("12/31/2015", '%m/%d/%Y'))]
+dfQ1 = mergedDF[(all_data['dataObje']>datetime.strptime("1/1/2015", '%m/%d/%Y'))&(all_data['dataObje']<datetime.strptime("3/31/2015", '%m/%d/%Y'))]
+dfQ2 = mergedDF[(all_data['dataObje']>datetime.strptime("4/1/2015", '%m/%d/%Y'))&(all_data['dataObje']<datetime.strptime("6/30/2015", '%m/%d/%Y'))]
+dfQ3 = mergedDF[(all_data['dataObje']>datetime.strptime("7/1/2015", '%m/%d/%Y'))&(all_data['dataObje']<datetime.strptime("9/30/2015", '%m/%d/%Y'))]
+dfQ4 = mergedDF[(all_data['dataObje']>datetime.strptime("10/1/2015", '%m/%d/%Y'))&(all_data['dataObje']<datetime.strptime("12/31/2015", '%m/%d/%Y'))]
 singleVarHistogram(getX(dfQ1,'Out for drinks'),bins=15,title="Q1",xaxis="$")
 singleVarHistogram(getX(dfQ2,'Out for drinks'),bins=15,title="Q2",xaxis="$")
 singleVarHistogram(getX(dfQ1,'Out for drinks'),bins=15,title="Q3",xaxis="$")
@@ -84,7 +82,7 @@ myCols =  [u'Going from home to work', u'Going from work to home',
 df.gmail
  
 #smaller dataset for just the days where I have activity data.
-small_df = df[df['dataObje']>datetime.strptime("11/15/2015", '%m/%d/%Y')]
+small_df = all_data[all_data['dataObje']>datetime.strptime("11/15/2015", '%m/%d/%Y')]
 small_df[myCols].corr()
 small_df[myCols].corr().to_csv(path.format("cor_sheet.csv"),encoding="utf-8")
 
